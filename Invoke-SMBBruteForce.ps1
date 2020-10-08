@@ -106,7 +106,7 @@ function Invoke-SMBBruteForce
                              if($valid)
                              {
                                 Write-Host "[*]Success! Password for $u is $Password"
-                                Remove-SMBMapping -remotepath \\$target\IPC$
+                                Remove-SMBMapping -remotepath \\$target\IPC$ -Force
                                 break
                                 }
                         }
@@ -130,7 +130,7 @@ function Invoke-SMBBruteForce
                                 if($valid)
                                 {
                                 write-host "[*]Success! Password for $u is $pw"
-                                Remove-SMBMapping -remotepath \\$target\IPC$
+                                Remove-SMBMapping -remotepath \\$target\IPC$ -Force
                                 break
                                 }
                             }
@@ -165,7 +165,7 @@ function Invoke-SMBBruteForce
                          if($valid)
                          {
                             write-host "[*]Success! Password for $u is $Password"
-                            Remove-SMBMapping -remotepath \\$target\IPC$
+                            Remove-SMBMapping -remotepath \\$target\IPC$ -Force
                             break
                             }
                     }
@@ -188,7 +188,7 @@ function Invoke-SMBBruteForce
                             if($valid)
                             {
                                 Write-Host "[*]Success! Password for $u is $pw"
-                                Remove-SMBMapping -remotepath \\$target\IPC$
+                                Remove-SMBMapping -remotepath \\$target\IPC$ -Force
                                 break
                                 }
                         }
