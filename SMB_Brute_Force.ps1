@@ -22,7 +22,7 @@ function Invoke-SMBBruteForce
     [*]Trying to authenticate against \\192.168.0.10
     [*]Loaded 2000 passwords from password file.
     [*]Starting brute force operation.
-    [*]Success! Password: ilovemushrooms
+    [*]Success! Password for admin is ilovemushrooms
     [*]Completed.
 
  .Parameter Target
@@ -75,9 +75,7 @@ function Invoke-SMBBruteForce
         $Counter = 0
         Write-Host "[*]Trying to authenticate against \\$target"
 
-        $SetName = $PsCmdlet.ParameterSetName
-        write-host $SetName
-
+        Write-Host "[*] Starting Brute Force Operation"
             if(!$Username)
             {
                 $UserFileLength = (Get-Content $UsernameFile).Length
@@ -104,7 +102,8 @@ function Invoke-SMBBruteForce
                     }
                     else
                     {
-                        
+                        $PasswordFileLength = (get-content $PasswordFile).Length
+                        Write-Host "[*]Loaded $PasswordFileLength passwords from $PasswordFile"
                         foreach($pw in get-content $PasswordFile)
                         {
                             try
@@ -129,6 +128,7 @@ function Invoke-SMBBruteForce
             {
                 $u = "$Target\$Username"
                 Write-Host "[*]Attempting to brute force $target with the username $u "
+                Write-Host "[*] Starting Brute Force Operation"
                 if(!$PasswordFile)
                 {
                     try 
@@ -148,6 +148,8 @@ function Invoke-SMBBruteForce
                 }
                 else
                 {
+                    $PasswordFileLength = (get-content $PasswordFile).Length
+                    Write-Host "[*]Loaded $PasswordFileLength passwords from $PasswordFile"
                     foreach($pw in get-content $PasswordFile)
                     {
                         try
