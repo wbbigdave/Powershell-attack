@@ -70,7 +70,7 @@ funtion Invoke-SMBBruteForce
     [String] $PasswordFile
     )
 
-    Begin
+    Process
     {
 
         Write-Host "[*]Trying to authenticate against \\$target"
