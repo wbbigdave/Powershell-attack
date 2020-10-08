@@ -134,7 +134,9 @@ function Invoke-SMBBruteForce
                 {
                     try 
                     {
-                         $valid = new-smbmapping -remotepath \\$target -username $u -password $Password 
+                        Write-Host $u
+                         $valid = new-smbmapping -remotepath \\$target -username $u -password $Password
+                         $valid
                          if($valid)
                          {
                             write-host "[*]Success! Password for $u is $Password"
