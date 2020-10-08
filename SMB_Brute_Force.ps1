@@ -1,4 +1,4 @@
-funtion Invoke-SMBBruteForce
+function Invoke-SMBBruteForce
 
 {
 <#
